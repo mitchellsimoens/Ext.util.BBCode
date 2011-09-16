@@ -116,12 +116,12 @@ Ext.apply(Ext.util, {
 
                         if (tagAttr && me.uri_re.test(tagAttr)) {
                             me.urlstart = -1;
-                            return '<a href="' + tagAttr + '">';
+                            return '<a target="_blank" href="' + tagAttr + '">';
                         }
 
                         me.urlstart = tag.length + offset;
 
-                        return '<a href="';
+                        return '<a target="_blank" href="';
                     case 'q':
                     case 'blockquote':
                         me.opentags.push(new me.taginfo_t(tagType, '</' + tagType + '>'));
