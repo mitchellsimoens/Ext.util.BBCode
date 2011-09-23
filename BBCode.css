@@ -1,0 +1,46 @@
+.bbcode-quote {
+    background-color: gray;
+    border: 1px #fff dashed;
+}
+
+.bbcode-quote-username {
+    font-weight: bold;
+}
+
+.bbcode-quote-body {
+    padding: .5em;
+}
+
+.bbcode-li {
+    display: list-item;
+    position: relative;
+    list-style-type: disc;
+}
+
+.bbcode-ul {
+    padding: 1em;
+}
+
+.bbcode-s {
+    text-decoration: line-through;
+}
+
+.bbcode-code-pre {
+    background-color: gray;
+    border: 1px #fff dashed;
+}
+
+.bbcode-code {
+    padding: .5em;
+}
+
+.bbcode-title {
+    padding: .1em .5em;
+    font-style: italic;
+    border-bottom: 1px #000 solid;
+    font-size: .8em;
+}
+
+.bbcode-nostart-tag {
+    color: red;
+}

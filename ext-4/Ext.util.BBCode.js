@@ -4,11 +4,11 @@ Ext.apply(Ext.util, {
         noparse    : false,
         crlf2br    : true,
         opentags   : [],
-        postfmt_re : /([\r\n])|(?:\[([a-z]{1,16})(?:=([^\x00-\x1F"'\(\)<>\[\]]{1,256}))?\])|(?:\[\/([a-z]{1,16})\])/ig,
+        postfmt_re : /([\r\n])|(?:\[([a-z\*]{1,16})(?:=([^\x00-\x1F'\(\)<>\[\]]{1,256}))?\])|(?:\[\/([a-z]{1,16})\])/ig,
         uri_re     : /^[-;\/\?:@&=\+\$,_\.!~\*'\(\)%0-9a-z]{1,512}$/i,
         number_re  : /^[\\.0-9]{1,8}$/i,
         color_re   : /^(:?black|silver|gray|white|maroon|red|purple|fuchsia|green|lime|olive|yellow|navy|blue|teal|aqua|#(?:[0-9a-f]{3})?[0-9a-f]{3})$/i,
-        tagname_re : /^\/?(?:b|i|u|pre|samp|code|colou?r|size|noparse|url|s|q|blockquote)$/,
+        tagname_re : /^\/?(?:b|i|u|pre|list|(\*)|quote|samp|code|colou?r|size|noparse|url|s|q|blockquote)$/i,
 
         parse : function(str) {
             var me = this,
@@ -84,30 +84,39 @@ Ext.apply(Ext.util, {
                 }
 
                 switch (tagType) {
+                    case '*' :
+                        return '<li class="bbcode-li">';
+                    case 'list' :
+                        me.opentags.push(new me.taginfo_t(tagType, '</ul>'));
+                        return '<ul class="bbcode-ul">';
+                    case 'quote' :
+                        var username = tagAttr.split(';');
+                        me.opentags.push(new me.taginfo_t(tagType, '</div></div>'));
+                        return '<div class="bbcode-quote"><div class="bbcode-title">Quote by <span class="bbcode-quote-username">' + username[0] + '</span></div><div class="bbcode-quote-body">';
                     case 'code':
                         me.opentags.push(new me.taginfo_t(tagType, '</code></pre>'));
                         me.crlf2br = false;
-                        return '<pre><code>';
+                        return '<pre class="bbcode-code-pre"><div class="bbcode-title">Code</div><code class="bbcode-code">';
                     case 'pre':
                         me.opentags.push(new me.taginfo_t(tagType, '</pre>'));
                         me.crlf2br = false;
-                        return '<pre>';
+                        return '<pre class="bbcode-pre">';
                     case 'color':
                     case 'colour':
                         if (!tagAttr || !me.color_re.test(tagAttr)) {
                             tagAttr = 'inherit';
                         }
                         me.opentags.push(new me.taginfo_t(tagType, '</span>'));
-                        return '<span style="color: ' + tagAttr + '">';
+                        return '<span class="bbcode-color" style="color: ' + tagAttr + '">';
                     case 'size':
                         if (!tagAttr || !me.number_re.test(tagAttr)) {
                             tagAttr = 1;
                         }
                         me.opentags.push(new me.taginfo_t(tagType, '</span>'));
-                        return '<span style="font-size: ' + Math.min(Math.max(tagAttr, 0.7), 3) + 'em">';
+                        return '<span class="bbcode-size" style="font-size: ' + Math.min(Math.max(tagAttr, 0.7), 3) + 'em">';
                     case 's':
                         me.opentags.push(new me.taginfo_t(tagType, '</span>'));
-                        return '<span style="text-decoration: line-through">';
+                        return '<span class="bbcode-s">';
                     case 'noparse':
                         me.noparse = true;
                         return '';
@@ -116,12 +125,12 @@ Ext.apply(Ext.util, {
 
                         if (tagAttr && me.uri_re.test(tagAttr)) {
                             me.urlstart = -1;
-                            return '<a target="_blank" href="' + tagAttr + '">';
+                            return '<a class="bbcode-url" target="_blank" href="' + tagAttr + '">';
                         }
 
                         me.urlstart = tag.length + offset;
 
-                        return '<a target="_blank" href="';
+                        return '<a class="bbcode-url" target="_blank" href="';
                     case 'q':
                     case 'blockquote':
                         me.opentags.push(new me.taginfo_t(tagType, '</' + tagType + '>'));
@@ -143,7 +152,7 @@ Ext.apply(Ext.util, {
                 }
 
                 if (!me.opentags.length || me.opentags[me.opentags.length-1].bbtag != endTag) {
-                    return '<span style="color: red">[/' + endTag + ']</span>';
+                    return '<span class="bbcode-nostart-tag">[/' + endTag + ']</span>';
                 }
 
                 if (endTag === 'url') {
